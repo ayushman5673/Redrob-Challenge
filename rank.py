@@ -667,7 +667,8 @@ def run_ranking(candidates_file, output_file):
         completeness = (has_career_desc * 0.30) + (has_skills_5 * 0.20) + (has_github * 0.20) + (has_verified_contact * 0.15) + (has_career_history * 0.15)
         
         name = profile.get("anonymized_name", "Anonymous Candidate")
-        last_job = career[-1] if career else {}
+        # Get most recent job (career list is sorted in reverse-chronological order)
+        last_job = career[0] if career else {}
         top_company = last_job.get("company", "Product Company")
         last_title = last_job.get("title", "AI Engineer")
         
