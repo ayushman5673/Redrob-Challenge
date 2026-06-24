@@ -724,14 +724,14 @@ def run_ranking(candidates_file, output_file):
         scored_candidates.append({
             "candidate_id": cid,
             "final_score": round(final_score, 4),
-            "s_sem": round(s_sem, 4),
-            "s_skill": round(s_skill, 4),
-            "s_exp": round(s_exp, 4),
-            "s_emp": round(s_emp, 4),
-            "s_loc": round(s_loc, 4),
-            "m_beh": round(m_beh, 4),
+            "semantic_fit_score": round(s_sem, 4),
+            "skills_match_score": round(s_skill, 4),
+            "experience_fit_score": round(s_exp, 4),
+            "employer_tier_score": round(s_emp, 4),
+            "location_fit_score": round(s_loc, 4),
+            "behavioral_reliability_multiplier": round(m_beh, 4),
             "profile_completeness": round(completeness, 4),
-            "flags": "|".join(flags) if flags else "none",
+            "applied_penalties": "|".join(flags) if flags else "none",
             "reasoning": reasoning
         })
         
@@ -770,7 +770,7 @@ def run_ranking(candidates_file, output_file):
     print(f"Writing detailed rankings to {detailed_file}...")
     detailed_df = pd.DataFrame(results_detailed)
     # Ensure rank is the first column
-    detailed_cols = ["rank", "candidate_id", "final_score", "s_sem", "s_skill", "s_exp", "s_emp", "s_loc", "m_beh", "profile_completeness", "flags", "reasoning"]
+    detailed_cols = ["rank", "candidate_id", "final_score", "semantic_fit_score", "skills_match_score", "experience_fit_score", "employer_tier_score", "location_fit_score", "behavioral_reliability_multiplier", "profile_completeness", "applied_penalties", "reasoning"]
     detailed_df = detailed_df[detailed_cols]
     detailed_df.to_csv(detailed_file, index=False)
     print("Ranking finished successfully!")
