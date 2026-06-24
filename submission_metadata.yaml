@@ -1,0 +1,88 @@
+# Redrob Hackathon — Submission Metadata
+# The fields here should match what you submit via the portal at upload time.
+
+# ============================================================================
+# Team identity (Please fill these in with your details)
+# ============================================================================
+team_name: "Purushartha"  # Used in leaderboard and announcements
+
+primary_contact:
+  name: "Ayushman Parashar"
+  email: "ayushmanparashar5673@gmail.com"   # Used for all organizer communication
+  phone: "+91-8580165551"        # Used for top-50 / top-10 outreach
+
+team_members:
+  - name: "Ravi Shankar Gupta"
+    email: "ravishankar.kr440@gmail.com"
+    role: "ML Engineer"
+team_members:
+  - name: "Tushar Kumar"
+    email: "tusharkr4uall@gmail.com"
+    role: ""
+team_members:
+  - name: "Mantu Kumar Yadav"
+    email: "mantuyadav1953@gmail.com"
+    role: ""
+  # Add more members as needed; solo participants list just one member
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/ayushman5673/Redrob-Challenge"
+# Required. Must be reachable. Private repos OK if you can grant organizer
+# access at Stage 3.
+
+sandbox_link: "https://ayushman5673-redrob-challenge-app-1q9pf3.streamlit.app/"
+# Required. A working hosted environment where the ranker can be run on a small candidate sample.
+
+reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
+# The single command that produces submission.csv from candidates.jsonl.
+# Completes within 5 minutes on CPU with 16GB RAM and no network.
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "Windows Local Machine"
+  cpu_cores: 8
+  ram_gb: 16
+  python_version: "3.12.2"
+  os: "Windows"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: false
+  pre_computation_time_minutes: 0
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+ai_tools_used:
+  - "Claude"
+  - "Gemini"
+  - "Cursor"
+
+ai_usage_summary: |
+  Used Gemini/Claude for code refactoring, architecture optimization, bug fixing, and formatting.
+
+# ============================================================================
+# Approach summary (optional but recommended)
+# ============================================================================
+methodology_summary: |
+  A high-performance two-stage retrieve-and-rank pipeline.
+  Stage 1 streams all 100k candidates to filter out hard
+  exclusions (honeypots, trap titles, location blocks)
+  and scores them with a lightweight heuristic to select
+  the top 1,500 candidates. Stage 2 runs a deep semantic
+  scoring using offline cached sentence-transformer embeddings
+  ('all-MiniLM-L6-v2'), combined with experience, skills (with recency decay ),
+  and employer quality signals, as well as a multi-signal availability modifier.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true
