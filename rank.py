@@ -249,11 +249,11 @@ def run_ranking(candidates_file, output_file):
         matched_skills = cand_skills & ALL_CRITICAL_CLEAN_SKILLS
         h_skills = len(matched_skills)
         
-        # 3. Title match keywords (favoring AI/ML/Software engineers)
+        # 3. Title match keywords (favoring AI/ML/Search/Recommendation engineers)
         h_title = 0.0
-        if any(w in current_title for w in ["machine learning", "ml", "ai", "artificial intelligence", "nlp", "computer vision", "data scientist", "deep learning"]):
+        if any(w in current_title for w in ["machine learning", "ml", "ai", "artificial intelligence", "nlp", "computer vision", "data scientist", "deep learning", "recommendation", "search", "retrieval"]):
             h_title += 1.0
-        elif "software engineer" in current_title or "backend engineer" in current_title or "developer" in current_title:
+        elif "software engineer" in current_title or "backend engineer" in current_title or "developer" in current_title or "engineer" in current_title:
             h_title += 0.5
             
         # 4. Active & Response rates (availability)
@@ -278,11 +278,11 @@ def run_ranking(candidates_file, output_file):
                 process_cand(cand)
             
     print(f"Candidates passed hard filters: {len(stage1_candidates)}")
-    print("Selecting top 750 candidates for Stage 2 scoring...")
+    print("Selecting top 1000 candidates for Stage 2 scoring...")
     stage1_candidates.sort(key=lambda x: x[0], reverse=True)
     
-    # Slice to top 750 candidates for dense embedding scoring
-    top_candidates = [x[1] for x in stage1_candidates[:750]]
+    # Slice to top 1000 candidates for dense embedding scoring
+    top_candidates = [x[1] for x in stage1_candidates[:1000]]
     
     # 2. Stage 2 — Dense Semantic Encoding
     script_dir = os.path.dirname(os.path.abspath(__file__))
