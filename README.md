@@ -38,18 +38,10 @@ pip install -r requirements.txt
 
 ## Running the Ranker
 
-### General Command (For Judges / General Execution)
-To run the ranking step, use the following command by passing the path to the candidates file and your desired output path:
+To run the ranking step, pass the path to the candidates file and your desired output path:
 
 ```bash
-python rank.py --candidates <path_to_candidates.jsonl> --out <path_to_submission.csv>
-```
-
-### Local Workspace Execution (For Your Machine)
-From the repository folder (`C:\Users\Ayush\Desktop\Ai recruiter candidate ranking System`), you can run the ranker on your local dataset using:
-
-```bash
-python rank.py --candidates "..\Redrob\[PUB] India_runs_data_and_ai_challenge\[PUB] India_runs_data_and_ai_challenge\India_runs_data_and_ai_challenge\candidates.jsonl" --out "submission.csv"
+python rank.py --candidates ./path/to/candidates.jsonl --out ./submission.csv
 ```
 
 This will output two files:
@@ -58,16 +50,8 @@ This will output two files:
 
 ## Validation
 
-### General Command (For Judges / General Execution)
-To run the official submission validator:
+To run the official submission validator on your generated output:
 
 ```bash
-python <path_to_validate_submission.py> <path_to_submission.csv>
-```
-
-### Local Workspace Execution (For Your Machine)
-From the repository folder, run the validator using:
-
-```bash
-python "..\Redrob\[PUB] India_runs_data_and_ai_challenge\[PUB] India_runs_data_and_ai_challenge\India_runs_data_and_ai_challenge\validate_submission.py" "submission.csv"
+python ./path/to/validate_submission.py ./submission.csv
 ```
