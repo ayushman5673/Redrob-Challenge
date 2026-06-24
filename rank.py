@@ -77,7 +77,8 @@ def parse_date(date_str):
     if not date_str:
         return None
     try:
-        return datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+        parts = date_str.split("-")
+        return datetime.date(int(parts[0]), int(parts[1]), int(parts[2]))
     except:
         return None
 
@@ -86,8 +87,9 @@ def get_job_duration_months(job):
     if duration is not None:
         return duration
     start = parse_date(job.get("start_date"))
-    end = parse_date(job.get("end_date")) or CURRENT_DATE
-    if start:
+    end_date_str = job.get("end_date")
+    end = parse_date(end_date_str) if end_date_str else CURRENT_DATE
+    if start and end:
         return (end.year - start.year) * 12 + (end.month - start.month)
     return 0
 
@@ -205,18 +207,14 @@ def run_ranking(candidates_file, output_file):
         # Check 5: future start dates
         for job in career:
             start = job.get("start_date")
+            end = job.get("end_date")
             if start:
-                try:
-                    s_date = parse_date(start)
-                    if s_date and s_date > CURRENT_DATE:
-                        is_honeypot = True
-                        break
-                    end = parse_date(job.get("end_date"))
-                    if s_date and end and s_date > end:
-                        is_honeypot = True
-                        break
-                except:
-                    pass
+                if start > "2026-06-18":
+                    is_honeypot = True
+                    break
+                if end and start > end:
+                    is_honeypot = True
+                    break
         if is_honeypot:
             return
             
@@ -280,11 +278,11 @@ def run_ranking(candidates_file, output_file):
                 process_cand(cand)
             
     print(f"Candidates passed hard filters: {len(stage1_candidates)}")
-    print("Selecting top 1,500 candidates for Stage 2 scoring...")
+    print("Selecting top 750 candidates for Stage 2 scoring...")
     stage1_candidates.sort(key=lambda x: x[0], reverse=True)
     
-    # Slice to top 1,500 candidates for dense embedding scoring
-    top_candidates = [x[1] for x in stage1_candidates[:1500]]
+    # Slice to top 750 candidates for dense embedding scoring
+    top_candidates = [x[1] for x in stage1_candidates[:750]]
     
     # 2. Stage 2 — Dense Semantic Encoding
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -396,22 +394,24 @@ def run_ranking(candidates_file, output_file):
             years_since_use = 2.0
             
             # Search career history for matches
-            latest_end_date = None
+            latest_end_date_str = None
             for job in career:
                 title = job.get("title", "").lower()
                 desc = job.get("description", "").lower()
                 if (sname_clean in clean_name(title)) or (sname_clean in clean_name(desc)):
-                    end_d = parse_date(job.get("end_date"))
-                    if job.get("is_current") or end_d is None:
-                        latest_end_date = CURRENT_DATE
+                    end_date_str = job.get("end_date")
+                    if job.get("is_current") or not end_date_str:
+                        latest_end_date_str = "2026-06-18"
                         break
-                    elif latest_end_date is None or end_d > latest_end_date:
-                        latest_end_date = end_d
+                    elif latest_end_date_str is None or end_date_str > latest_end_date_str:
+                        latest_end_date_str = end_date_str
             
-            if latest_end_date:
-                years_since_use = (CURRENT_DATE - latest_end_date).days / 365.25
-                if years_since_use < 0:
-                    years_since_use = 0
+            if latest_end_date_str:
+                latest_end_date = parse_date(latest_end_date_str)
+                if latest_end_date:
+                    years_since_use = (CURRENT_DATE - latest_end_date).days / 365.25
+                    if years_since_use < 0:
+                        years_since_use = 0
             skill_last_used_years[sname_clean] = years_since_use
             
         proficiency_weights = {"expert": 1.0, "advanced": 0.8, "intermediate": 0.5, "beginner": 0.2}
@@ -562,9 +562,9 @@ def run_ranking(candidates_file, output_file):
         if exp > 0 and len(career) >= 2:
             sorted_jobs = []
             for j in career:
-                start_d = parse_date(j.get("start_date"))
-                if start_d:
-                    sorted_jobs.append((start_d, j))
+                start_str = j.get("start_date")
+                if start_str:
+                    sorted_jobs.append((start_str, j))
             sorted_jobs.sort(key=lambda x: x[0])
             
             if len(sorted_jobs) >= 2:
