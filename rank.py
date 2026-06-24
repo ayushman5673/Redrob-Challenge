@@ -143,124 +143,141 @@ def run_ranking(candidates_file, output_file):
     stage1_candidates = []
     
     # 1. Stage 1 — Coarse Filter & Heuristic Selection
-    # Stream candidates and filter honeypots, trap titles, location hard blocks
+    # Detect if file is a JSON array (starts with '[') or JSONL
+    first_char = ''
     with open(candidates_file, 'r', encoding='utf-8') as f:
         for line in f:
-            if not line.strip():
-                continue
-            cand = json.loads(line)
-            profile = cand.get("profile", {})
-            career = cand.get("career_history", [])
-            skills = cand.get("skills", [])
-            signals = cand.get("redrob_signals", {})
+            stripped = line.strip()
+            if stripped:
+                first_char = stripped[0]
+                break
+
+    def process_cand(cand):
+        profile = cand.get("profile", {})
+        career = cand.get("career_history", [])
+        skills = cand.get("skills", [])
+        signals = cand.get("redrob_signals", {})
+        
+        # --- 1A. Physical Validity / Honeypots ---
+        is_honeypot = False
+        
+        # Check 1: job duration exceeds total XP
+        exp = profile.get("years_of_experience", 0)
+        for job in career:
+            dur_years = get_job_duration_months(job) / 12.0
+            if dur_years > exp + 0.1:
+                is_honeypot = True
+                break
+        if is_honeypot:
+            return
             
-            # --- 1A. Physical Validity / Honeypots ---
-            is_honeypot = False
-            
-            # Check 1: job duration exceeds total XP
-            exp = profile.get("years_of_experience", 0)
-            for job in career:
-                dur_years = get_job_duration_months(job) / 12.0
-                if dur_years > exp + 0.1:
-                    is_honeypot = True
-                    break
-            if is_honeypot:
-                continue
-                
-            # Check 2: company founding violations
-            for job in career:
-                comp = job.get("company", "")
-                start = job.get("start_date")
-                dur = get_job_duration_months(job)
-                if comp in FOUNDING_RULES:
-                    rule = FOUNDING_RULES[comp]
-                    if start:
-                        try:
-                            start_year = int(start[:4])
-                            if start_year < rule["min_start_year"]:
-                                is_honeypot = True
-                                break
-                        except:
-                            pass
-                    if dur > rule["max_duration_months"]:
-                        is_honeypot = True
-                        break
-            if is_honeypot:
-                continue
-                
-            # Check 3: expert skill inflation
-            expert_0_dur = [s for s in skills if s.get("proficiency") == "expert" and s.get("duration_months", 0) == 0]
-            if len(expert_0_dur) >= 5:
-                continue
-                
-            # Check 4: overlapping current roles
-            current_jobs = [job for job in career if job.get("is_current")]
-            if len(current_jobs) > 1:
-                continue
-                
-            # Check 5: future start dates
-            for job in career:
-                start = job.get("start_date")
+        # Check 2: company founding violations
+        for job in career:
+            comp = job.get("company", "")
+            start = job.get("start_date")
+            dur = get_job_duration_months(job)
+            if comp in FOUNDING_RULES:
+                rule = FOUNDING_RULES[comp]
                 if start:
                     try:
-                        s_date = parse_date(start)
-                        if s_date and s_date > CURRENT_DATE:
-                            is_honeypot = True
-                            break
-                        end = parse_date(job.get("end_date"))
-                        if s_date and end and s_date > end:
+                        start_year = int(start[:4])
+                        if start_year < rule["min_start_year"]:
                             is_honeypot = True
                             break
                     except:
                         pass
-            if is_honeypot:
-                continue
-                
-            # --- 1B. Trap Title Filter ---
-            current_title = profile.get("current_title", "").lower()
-            if any(t in current_title for t in TRAP_TITLES):
-                continue
-                
-            # --- 1C. Location Hard Block ---
-            country = profile.get("country", "").lower()
-            willing_relocate = profile.get("willing_to_relocate", None)
-            if willing_relocate is None:
-                willing_relocate = signals.get("willing_to_relocate", None)
-                
-            if "india" not in country:
-                if willing_relocate is False or willing_relocate is None:
+                if dur > rule["max_duration_months"]:
+                    is_honeypot = True
+                    break
+        if is_honeypot:
+            return
+            
+        # Check 3: expert skill inflation
+        expert_0_dur = [s for s in skills if s.get("proficiency") == "expert" and s.get("duration_months", 0) == 0]
+        if len(expert_0_dur) >= 5:
+            return
+            
+        # Check 4: overlapping current roles
+        current_jobs = [job for job in career if job.get("is_current")]
+        if len(current_jobs) > 1:
+            return
+            
+        # Check 5: future start dates
+        for job in career:
+            start = job.get("start_date")
+            if start:
+                try:
+                    s_date = parse_date(start)
+                    if s_date and s_date > CURRENT_DATE:
+                        is_honeypot = True
+                        break
+                    end = parse_date(job.get("end_date"))
+                    if s_date and end and s_date > end:
+                        is_honeypot = True
+                        break
+                except:
+                    pass
+        if is_honeypot:
+            return
+            
+        # --- 1B. Trap Title Filter ---
+        current_title = profile.get("current_title", "").lower()
+        if any(t in current_title for t in TRAP_TITLES):
+            return
+            
+        # --- 1C. Location Hard Block ---
+        country = profile.get("country", "").lower()
+        willing_relocate = profile.get("willing_to_relocate", None)
+        if willing_relocate is None:
+            willing_relocate = signals.get("willing_to_relocate", None)
+            
+        if "india" not in country:
+            if willing_relocate is False or willing_relocate is None:
+                return
+        
+        # --- Heuristic Selection (Filter top 1,500) ---
+        # 1. Experience score heuristic (peaking at 6-8 years)
+        if 6.0 <= exp <= 8.0:
+            h_exp = 1.00
+        elif (5.0 <= exp < 6.0) or (8.0 < exp <= 9.5):
+            h_exp = 0.85
+        elif (4.0 <= exp < 5.0) or (9.5 < exp <= 12.0):
+            h_exp = 0.60
+        else:
+            h_exp = 0.20
+            
+        # 2. Critical skills match count
+        cand_skills = {clean_name(s.get("name", "")) for s in skills}
+        matched_skills = cand_skills & ALL_CRITICAL_CLEAN_SKILLS
+        h_skills = len(matched_skills)
+        
+        # 3. Title match keywords (favoring AI/ML/Software engineers)
+        h_title = 0.0
+        if any(w in current_title for w in ["machine learning", "ml", "ai", "artificial intelligence", "nlp", "computer vision", "data scientist", "deep learning"]):
+            h_title += 1.0
+        elif "software engineer" in current_title or "backend engineer" in current_title or "developer" in current_title:
+            h_title += 0.5
+            
+        # 4. Active & Response rates (availability)
+        recruiter_rate = signals.get("recruiter_response_rate", 0.5)
+        
+        # Heuristic composite
+        h_score = h_exp * 2.0 + h_skills * 1.5 + h_title * 2.0 + recruiter_rate * 1.0
+        
+        stage1_candidates.append((h_score, cand))
+
+    if first_char == '[':
+        with open(candidates_file, 'r', encoding='utf-8') as f:
+            candidates_list = json.load(f)
+        for cand in candidates_list:
+            process_cand(cand)
+    else:
+        with open(candidates_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                if not line.strip():
                     continue
-            
-            # --- Heuristic Selection (Filter top 1,500) ---
-            # 1. Experience score heuristic (peaking at 6-8 years)
-            if 6.0 <= exp <= 8.0:
-                h_exp = 1.00
-            elif (5.0 <= exp < 6.0) or (8.0 < exp <= 9.5):
-                h_exp = 0.85
-            elif (4.0 <= exp < 5.0) or (9.5 < exp <= 12.0):
-                h_exp = 0.60
-            else:
-                h_exp = 0.20
-                
-            # 2. Critical skills match count
-            cand_skills = {clean_name(s.get("name", "")) for s in skills}
-            matched_skills = cand_skills & ALL_CRITICAL_CLEAN_SKILLS
-            h_skills = len(matched_skills)
-            
-            # 3. Title match keywords (favoring AI/ML/Software engineers)
-            h_title = 0.0
-            if any(w in current_title for w in ["machine learning", "ml", "ai", "artificial intelligence", "nlp", "computer vision", "data scientist", "deep learning"]):
-                h_title += 1.0
-            elif "software engineer" in current_title or "backend engineer" in current_title or "developer" in current_title:
-                h_title += 0.5
-                
-            # 4. Active & Response rates (availability)
-            recruiter_rate = signals.get("recruiter_response_rate", 0.5)
-            
-            # Heuristic composite
-            h_score = h_exp * 2.0 + h_skills * 1.5 + h_title * 2.0 + recruiter_rate * 1.0
-            
-            stage1_candidates.append((h_score, cand))
+                cand = json.loads(line)
+                process_cand(cand)
             
     print(f"Candidates passed hard filters: {len(stage1_candidates)}")
     print("Selecting top 1,500 candidates for Stage 2 scoring...")
@@ -270,7 +287,8 @@ def run_ranking(candidates_file, output_file):
     top_candidates = [x[1] for x in stage1_candidates[:1500]]
     
     # 2. Stage 2 — Dense Semantic Encoding
-    model_cache_path = "./model_cache"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    model_cache_path = os.path.join(script_dir, "model_cache")
     print(f"Loading local SentenceTransformer model from {model_cache_path}...")
     model = SentenceTransformer(model_cache_path)
     
