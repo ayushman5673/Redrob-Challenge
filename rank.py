@@ -698,10 +698,26 @@ def run_ranking(candidates_file, output_file):
         notice_days_val = notice_days if notice_days is not None else 60
         
         # Build reasoned string
+        gap_notes = []
+        if consulting_fraction > 0.0:
+            gap_notes.append("includes consulting history")
+        if recruiter_response_rate < 0.70:
+            gap_notes.append("lower recruiter responsiveness")
+        if last_active_days > 60:
+            gap_notes.append("recent inactivity")
+        if notice_days_val > 60:
+            gap_notes.append("longer notice period")
+        if completeness < 0.70:
+            gap_notes.append("incomplete profile details")
+            
+        gap_str = ""
+        if gap_notes:
+            gap_str = f" Note: {', '.join(gap_notes)}."
+            
         reasoning = (
             f"{name} brings {int(exp)}y of ML/AI experience, most recently at {top_company} as {last_title}. "
             f"Strong hands-on match on {top_3_skills_str}. {location_note}. "
-            f"Available in {notice_days_val} days{github_note}."
+            f"Available in {notice_days_val} days{github_note}.{gap_str}"
         )
         
         scored_candidates.append({
