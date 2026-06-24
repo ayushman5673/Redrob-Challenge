@@ -38,25 +38,35 @@ pip install -r requirements.txt
 
 ## Running the Ranker
 
-To run the ranking script on the `candidates.jsonl` file, navigate to the repository directory and use the path pointing to where the challenge dataset is located on your machine.
-
-For your current directory structure, you can run the following command from the repository folder (`C:\Users\Ayush\Desktop\Ai recruiter candidate ranking System`):
+### General Command (For Judges / General Execution)
+To run the ranking step, use the following command by passing the path to the candidates file and your desired output path:
 
 ```bash
-# Activate the virtual environment
-..\Redrob\.venv\Scripts\Activate.ps1
+python rank.py --candidates <path_to_candidates.jsonl> --out <path_to_submission.csv>
+```
 
-# Run the ranker on the full 100k candidate pool
+### Local Workspace Execution (For Your Machine)
+From the repository folder (`C:\Users\Ayush\Desktop\Ai recruiter candidate ranking System`), you can run the ranker on your local dataset using:
+
+```bash
 python rank.py --candidates "..\Redrob\[PUB] India_runs_data_and_ai_challenge\[PUB] India_runs_data_and_ai_challenge\India_runs_data_and_ai_challenge\candidates.jsonl" --out "submission.csv"
 ```
 
-This will output two files inside the repository folder:
+This will output two files:
 -   `submission.csv`: Exactly 100 candidates ranked, containing the columns: `candidate_id,rank,score,reasoning`.
 -   `submission_detailed.csv`: A comprehensive 12-column file containing sub-score decompositions, reliability metrics, and debug flags for explainability.
 
 ## Validation
 
-You can validate the generated `submission.csv` using the official validator script:
+### General Command (For Judges / General Execution)
+To run the official submission validator:
+
+```bash
+python <path_to_validate_submission.py> <path_to_submission.csv>
+```
+
+### Local Workspace Execution (For Your Machine)
+From the repository folder, run the validator using:
 
 ```bash
 python "..\Redrob\[PUB] India_runs_data_and_ai_challenge\[PUB] India_runs_data_and_ai_challenge\India_runs_data_and_ai_challenge\validate_submission.py" "submission.csv"
