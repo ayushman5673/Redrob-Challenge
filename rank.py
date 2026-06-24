@@ -278,11 +278,11 @@ def run_ranking(candidates_file, output_file):
                 process_cand(cand)
             
     print(f"Candidates passed hard filters: {len(stage1_candidates)}")
-    print("Selecting top 1000 candidates for Stage 2 scoring...")
+    print("Selecting top 1500 candidates for Stage 2 scoring...")
     stage1_candidates.sort(key=lambda x: x[0], reverse=True)
     
-    # Slice to top 1000 candidates for dense embedding scoring
-    top_candidates = [x[1] for x in stage1_candidates[:1000]]
+    # Slice to top 1500 candidates for dense embedding scoring
+    top_candidates = [x[1] for x in stage1_candidates[:1500]]
     
     # 2. Stage 2 — Dense Semantic Encoding
     script_dir = os.path.dirname(os.path.abspath(__file__))
