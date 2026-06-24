@@ -38,20 +38,26 @@ pip install -r requirements.txt
 
 ## Running the Ranker
 
-To run the ranking script on a `candidates.jsonl` file and produce the submission:
+To run the ranking script on the `candidates.jsonl` file, navigate to the repository directory and use the path pointing to where the challenge dataset is located on your machine.
+
+For your current directory structure, you can run the following command from the repository folder (`C:\Users\Ayush\Desktop\Ai recruiter candidate ranking System`):
 
 ```bash
-python rank.py --candidates "./[PUB] India_runs_data_and_ai_challenge/[PUB] India_runs_data_and_ai_challenge/India_runs_data_and_ai_challenge/candidates.jsonl" --out "./submission.csv"
+# Activate the virtual environment
+..\Redrob\.venv\Scripts\Activate.ps1
+
+# Run the ranker on the full 100k candidate pool
+python rank.py --candidates "..\Redrob\[PUB] India_runs_data_and_ai_challenge\[PUB] India_runs_data_and_ai_challenge\India_runs_data_and_ai_challenge\candidates.jsonl" --out "submission.csv"
 ```
 
-This will output two files:
+This will output two files inside the repository folder:
 -   `submission.csv`: Exactly 100 candidates ranked, containing the columns: `candidate_id,rank,score,reasoning`.
 -   `submission_detailed.csv`: A comprehensive 12-column file containing sub-score decompositions, reliability metrics, and debug flags for explainability.
 
 ## Validation
 
-You can validate the generated `submission.csv` using the included validator script:
+You can validate the generated `submission.csv` using the official validator script:
 
 ```bash
-python "./[PUB] India_runs_data_and_ai_challenge/[PUB] India_runs_data_and_ai_challenge/India_runs_data_and_ai_challenge/validate_submission.py" "./submission.csv"
+python "..\Redrob\[PUB] India_runs_data_and_ai_challenge\[PUB] India_runs_data_and_ai_challenge\India_runs_data_and_ai_challenge\validate_submission.py" "submission.csv"
 ```
