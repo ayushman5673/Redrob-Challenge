@@ -20,7 +20,7 @@ The ranker uses a **Two-Stage Pipeline** to balance high-quality semantic unders
 
 ## Installation & Setup
 
-Ensure Python 3.11 is installed, then run:
+Ensure Python 3.12 (or 3.11+) is installed, then run:
 
 ```bash
 # 1. Create a virtual environment
