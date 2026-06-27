@@ -103,6 +103,19 @@ if uploaded_file is not None:
                     help="Compliant 4-column CSV file required for portal upload (candidate_id, rank, score, reasoning)."
                 )
                 
+                # Download button for submission XLSX
+                temp_excel_path = temp_output_path.replace(".csv", ".xlsx")
+                if os.path.exists(temp_excel_path):
+                    with open(temp_excel_path, "rb") as f:
+                        excel_data = f.read()
+                    st.download_button(
+                        label="Download Standard Submission XLSX (4-columns)",
+                        data=excel_data,
+                        file_name="submission.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        help="Compliant 4-column Excel file in XLSX format."
+                    )
+                
             with d_col2:
                 if has_detailed:
                     with open(temp_detailed_path, "r", encoding="utf-8") as f:
@@ -114,6 +127,20 @@ if uploaded_file is not None:
                         mime="text/csv",
                         help="Detailed CSV with full sub-score breakdowns (semantic match, skills, exp, location, company tiers) and recruiter flags."
                     )
+                    
+                    # Download button for detailed XLSX
+                    temp_detailed_excel_path = temp_detailed_path.replace(".csv", ".xlsx")
+                    if os.path.exists(temp_detailed_excel_path):
+                        with open(temp_detailed_excel_path, "rb") as f:
+                            detailed_excel_data = f.read()
+                        st.download_button(
+                            label="Download Detailed Recruiter XLSX (12-columns)",
+                            data=detailed_excel_data,
+                            file_name="submission_detailed.xlsx",
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            help="Detailed Excel file with full sub-score breakdowns in XLSX format."
+                        )
+
             
             st.markdown("<br>", unsafe_allow_html=True)
 

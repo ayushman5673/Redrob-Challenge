@@ -765,6 +765,14 @@ def run_ranking(candidates_file, output_file):
     sub_df = sub_df[["candidate_id", "rank", "score", "reasoning"]]
     sub_df.to_csv(output_file, index=False)
     
+    # Also write to XLSX format in case the portal requires XLSX
+    excel_file = output_file.replace(".csv", ".xlsx")
+    print(f"Writing final submission XLSX to {excel_file}...")
+    try:
+        sub_df.to_excel(excel_file, index=False)
+    except Exception as e:
+        print(f"Warning: Could not write XLSX file: {e}")
+    
     # Write detailed CSV for recruiter explainability (All 12 columns)
     detailed_file = output_file.replace(".csv", "_detailed.csv")
     print(f"Writing detailed rankings to {detailed_file}...")
@@ -773,7 +781,17 @@ def run_ranking(candidates_file, output_file):
     detailed_cols = ["rank", "candidate_id", "final_score", "semantic_fit_score", "skills_match_score", "experience_fit_score", "employer_tier_score", "location_fit_score", "behavioral_reliability_multiplier", "profile_completeness", "applied_penalties", "reasoning"]
     detailed_df = detailed_df[detailed_cols]
     detailed_df.to_csv(detailed_file, index=False)
+    
+    # Also write detailed to XLSX
+    detailed_excel = detailed_file.replace(".csv", ".xlsx")
+    print(f"Writing detailed rankings to XLSX: {detailed_excel}...")
+    try:
+        detailed_df.to_excel(detailed_excel, index=False)
+    except Exception as e:
+        print(f"Warning: Could not write detailed XLSX file: {e}")
+        
     print("Ranking finished successfully!")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Rank candidates against Senior AI Engineer JD.")
