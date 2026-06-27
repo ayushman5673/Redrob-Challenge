@@ -13,9 +13,10 @@ from tqdm import tqdm
 # Optimize PyTorch CPU inference threads based on environment cpu cores
 import os
 cpu_count = os.cpu_count() or 4
-# Limit to max 8 threads to avoid context switching thrashing on massive servers,
-# but scale dynamically to match declared CPU cores on the local machine.
-torch.set_num_threads(min(8, cpu_count))
+# Limit to max 4 threads to avoid context switching thrashing on massive servers,
+# and to prevent thread contention which slows down execution on 8-core CPUs.
+torch.set_num_threads(min(4, cpu_count))
+
 
 
 CURRENT_DATE = datetime.date(2026, 6, 18)
