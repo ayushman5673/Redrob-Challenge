@@ -10,8 +10,13 @@ import torch
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
-# Optimize PyTorch CPU inference threads to avoid context switching thrashing
-torch.set_num_threads(4)
+# Optimize PyTorch CPU inference threads based on environment cpu cores
+import os
+cpu_count = os.cpu_count() or 4
+# Limit to max 8 threads to avoid context switching thrashing on massive servers,
+# but scale dynamically to match declared CPU cores on the local machine.
+torch.set_num_threads(min(8, cpu_count))
+
 
 CURRENT_DATE = datetime.date(2026, 6, 18)
 
