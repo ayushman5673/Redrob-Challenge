@@ -44,9 +44,12 @@ To run the ranking step, pass the path to the candidates file and your desired o
 python rank.py --candidates ./path/to/candidates.jsonl --out ./submission.csv
 ```
 
-This will output two files:
--   `submission.csv`: Exactly 100 candidates ranked, containing the columns: `candidate_id,rank,score,reasoning`.
--   `submission_detailed.csv`: A comprehensive 12-column file containing sub-score decompositions, reliability metrics, and debug flags for explainability.
+This will output four files:
+-   `submission.csv`: Exactly 100 candidates ranked, containing the columns: `candidate_id,rank,score,reasoning` (standard submission format).
+-   `submission.xlsx`: Excel workbook version of the 100-candidate ranking (provided for portals requiring XLSX upload).
+-   `submission_detailed.csv`: A comprehensive 12-column CSV file containing sub-score decompositions, reliability metrics, and applied penalties for recruiter explainability.
+-   `submission_detailed.xlsx`: Excel workbook version of the detailed recruiter explanation file.
+
 
 ## Validation
 
