@@ -1,42 +1,40 @@
-# Redrob Hackathon — Submission Metadata
-# The fields here should match what you submit via the portal at upload time.
-
+# Redrob Hackathon — Submission Metadat
 # ============================================================================
-# Team identity (Please fill these in with your details)
+# Team identity 
 # ============================================================================
-team_name: "Purushartha"  # Used in leaderboard and announcements
-
+team_name: "Purushartha"  
 primary_contact:
   name: "Ayushman Parashar"
-  email: "ayushmanparashar5673@gmail.com"   # Used for all organizer communication
-  phone: "+91-8580165551"        # Used for top-50 / top-10 outreach
+  email: "ayushmanparashar5673@gmail.com"   
+  phone: "+91-8580165551"        
+team_members:
+  name: "Ayushman Parashar"
+  email: "ayushmanparashar5673@gmail.com"
+  role: "Project Lead &  Backend Developer"
 
 team_members:
   - name: "Ravi Shankar Gupta"
     email: "ravishankar.kr440@gmail.com"
-    role: "ML Engineer"
+    role: "Tester & QA"
 team_members:
   - name: "Tushar Kumar"
     email: "tusharkr4uall@gmail.com"
-    role: ""
+    role: "Backend Developer"
 team_members:
   - name: "Mantu Kumar Yadav"
-    email: "mantuyadav1953@gmail.com"
-    role: ""
-  # Add more members as needed; solo participants list just one member
-
+    email: "mantuyadav91953@gmail.com"
+    role: "Documentation & Tester"
 # ============================================================================
 # Code and reproducibility
 # ============================================================================
 github_repo: "https://github.com/ayushman5673/Redrob-Challenge"
-# Required. Must be reachable. Private repos OK if you can grant organizer
-# access at Stage 3.
+
 
 sandbox_link: "https://ayushman5673-redrob-challenge-app-1q9pf3.streamlit.app/"
-# Required. A working hosted environment where the ranker can be run on a small candidate sample.
 
-reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
-# The single command that produces submission.csv from candidates.jsonl.
+
+reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./Purushartha.csv"
+# The single command that produces Purushartha.csv from candidates.jsonl.
 # Completes within 5 minutes on CPU with 16GB RAM and no network.
 
 # ============================================================================
@@ -65,7 +63,7 @@ ai_usage_summary: |
   Used Gemini/Claude for code refactoring, architecture optimization, bug fixing, and formatting.
 
 # ============================================================================
-# Approach summary (optional but recommended)
+# Approach summary
 # ============================================================================
 methodology_summary: |
   A high-performance two-stage retrieve-and-rank pipeline.

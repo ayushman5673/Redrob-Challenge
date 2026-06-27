@@ -41,14 +41,14 @@ pip install -r requirements.txt
 To run the ranking step, pass the path to the candidates file and your desired output path:
 
 ```bash
-python rank.py --candidates ./path/to/candidates.jsonl --out ./submission.csv
+python rank.py --candidates ./path/to/candidates.jsonl --out ./Purushartha.csv
 ```
 
 This will output four files:
--   `submission.csv`: Exactly 100 candidates ranked, containing the columns: `candidate_id,rank,score,reasoning` (standard submission format).
--   `submission.xlsx`: Excel workbook version of the 100-candidate ranking (provided for portals requiring XLSX upload).
--   `submission_detailed.csv`: A comprehensive 12-column CSV file containing sub-score decompositions, reliability metrics, and applied penalties for recruiter explainability.
--   `submission_detailed.xlsx`: Excel workbook version of the detailed recruiter explanation file.
+-   `Purushartha.csv`: Exactly 100 candidates ranked, containing the columns: `candidate_id,rank,score,reasoning` (standard submission format).
+-   `Purushartha.xlsx`: Excel workbook version of the 100-candidate ranking (provided for portals requiring XLSX upload).
+-   `Purushartha_detailed.csv`: A comprehensive 12-column CSV file containing sub-score decompositions, reliability metrics, and applied penalties for recruiter explainability.
+-   `Purushartha_detailed.xlsx`: Excel workbook version of the detailed recruiter explanation file.
 
 
 ## Validation
@@ -56,5 +56,5 @@ This will output four files:
 To run the official submission validator on your generated output:
 
 ```bash
-python ./path/to/validate_submission.py ./submission.csv
+python ./path/to/validate_submission.py ./Purushartha.csv
 ```
